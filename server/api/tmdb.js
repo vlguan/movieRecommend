@@ -1,25 +1,29 @@
-// import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-// import { options } from '../routes/record';
-require('dotenv').config();
-
 const apiKey = process.env.API_KEY;
 const BASEURL = process.env.BASEURL;
 
-export async function movieQuery(query) {
+async function movieQuery(query) {
   try {
-    const encodedQuery = query.replace(/ /g, '%20');
-    // query should be preencoded before url
+    const encodedQuery = encodeURIComponent(query);
+    // query should be preencoded before appending to the URL
     const url = `${BASEURL}/search/movie?query=${encodedQuery}`;
     const headers = {
       accept: 'application/json',
       Authorization: `Bearer ${apiKey}`
     };
 
-    const response = await axios.get(url, { headers });
+    const response = await fetch(url, { headers });
 
-    console.log(response.data);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    console.log(data);
   } catch (error) {
     console.error('Error:', error);
   }
 }
+
+
+exports.movieQuery = movieQuery;
