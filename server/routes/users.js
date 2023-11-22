@@ -11,22 +11,30 @@ const ObjectId = require("mongodb").ObjectId;
 // Create a user
 userRoutes.route('/user/register').post(function (req, response) {
   let db_connect = dbo.getDb();
+  //encrypts password
   let password = encryptServ.hashPassword(req.body.password)
-  let userObj = {
-    username: req.body.username,
-    password,
-    email: req.body.email
-  };
-  db_connect.collection("users").insertOne(userObj, function (err, res) {
-    if (err) throw err;
-    response.json(res);
-  });
+  let myquery = {username: ObjectId(req.body.username)}
+  // checks if username already exists
+  let result = db_connect.collection("users").findone(myquery);
+  if (result == null || result == undefined){
+    let userObj = {
+      username: req.body.username,
+      password,
+      email: req.body.email
+    };
+    db_connect.collection("users").insertOne(userObj, function (err, res) {
+      if (err) throw err;
+      response.json(res);
+    });
+  }else{
+    throw new Error('Username Already Exists')
+  }
  });
 
-// Get all users
-router.get('/', async (req, res) => {
+// Push recent search to history
+userRoutes.route('/user/history').post(function (req, res){
   try {
-    const users = await User.find();
+    let myquery = { _id: ObjectId(req.body.id) };
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });

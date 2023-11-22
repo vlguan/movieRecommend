@@ -14,8 +14,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  history: {
+    type: Array,
+    required: false
+  }
 });
 
 const User = mongoose.model('User', userSchema);
+async function save(){
 
+}
 module.exports = User;
