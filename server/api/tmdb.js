@@ -1,4 +1,4 @@
-require('dotenv').config( { path: "./config.env"})
+require('dotenv').config( { path: ".env"})
 const apiKey = process.env.API_KEY;
 const BASEURL = process.env.BASEURL;
 
@@ -14,7 +14,7 @@ async function movieQuery(query) {
 
     const response = await fetch(url, { options: 'GET', headers });
     const data = await response.json();
-    console.log(response);
+    // console.log(response);
     if (response.ok == false){
       throw new Error(`HTTP error! Status: ${response.status}`);
     }

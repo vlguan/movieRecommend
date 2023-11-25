@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 require('dotenv').config();
 const Db = process.env.ATLAS_URI;
 const userSchema = new mongoose.Schema({

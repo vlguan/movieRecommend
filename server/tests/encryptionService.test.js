@@ -6,7 +6,7 @@ describe('encryptionService', () => {
       it('should hash a password', async () => {
         const password = 'testPassword';
         const hashedPassword = await encryptionService.hashPassword(password);
-  
+        console.log(hashedPassword);
         // Ensure the hashed password is not the same as the original password
         expect(hashedPassword).not.toBe(password);
       });
