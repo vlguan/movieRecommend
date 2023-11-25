@@ -11,10 +11,8 @@ var _db;
 module.exports = {
   connectToServer: async function (callback) {
     try {
-      console.log('hello world');
       // console.log(await client.connect());
       _db = await client.db("register");
-      console.log(_db)
       console.log("Pinged your deployment. You successfully connected to MongoDB!");
     }catch(e){
       console.log(e);
