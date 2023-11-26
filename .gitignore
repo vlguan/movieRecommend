@@ -39,6 +39,8 @@ _site
 # .env file
 .env
 
+config.env
+
 # Mac OS
 .DS_Store
 
