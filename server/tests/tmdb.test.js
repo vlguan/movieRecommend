@@ -1,5 +1,5 @@
 // Import the movieQuery function
-const { movieQuery } = require('./tmdb');
+const { movieQuery } = require('../api/tmdb');
 
 // Mock the global fetch function for testing
 global.fetch = jest.fn();
