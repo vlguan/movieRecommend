@@ -53,10 +53,20 @@ router.route('/user/register').post(async function (req, res) {
     }
 });
 // Push recent search to history
-router.route('/user/history').post(async function (req, res){
+router.route('/user/history').post(authenticateUser, async function (req, res){
   try {
-    User.addSearchToHistory(username, req.body.searchTerm)
-    res.status(200).json(users);
+    const searchTerm = req.searchTerm;
+    const userCol =db_connect.collection('users');
+    const userId = req.user._id
+    const updateRes = await user.collection.updateOne(
+      {_id: userId},
+      { $push: {history:searchTerm}}
+      );
+      if (updateResult.modifiedCount === 1) {
+        res.status(200).json({ message: 'Search term added to history successfully' });
+      } else {
+        res.status(500).json({ error: 'Failed to add search term to history' });
+      }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
