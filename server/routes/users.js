@@ -62,7 +62,7 @@ router.route('/user/history').post(authenticateUser, async function (req, res){
       {_id: userId},
       { $push: {history:searchTerm}}
       );
-      if (updateResult.modifiedCount === 1) {
+      if (updateRes.modifiedCount === 1) {
         res.status(200).json({ message: 'Search term added to history successfully' });
       } else {
         res.status(500).json({ error: 'Failed to add search term to history' });
@@ -71,5 +71,21 @@ router.route('/user/history').post(authenticateUser, async function (req, res){
     res.status(500).json({ error: error.message });
   }
 });
-
+// Authenticates User on Login
+router.route('/user/login').post(async function(req,res){
+  try{
+    const { username, password } = req.body;
+    const userCol = db_connect.collection('users');
+    const user = await userCol.findONe({ username });
+    if (user && await encryptServ.comparePassword(password, user.password)){
+      req.session.userId = user._id;
+      res.status(200).json({message: 'Login Success'});
+    }else{
+      res.status(401).json({message: 'Invalid Username or Password'});
+    }
+  }catch(error){
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error'});
+  }
+})
 module.exports = router;
