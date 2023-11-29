@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 // This will help us connect to the database
 const dbo = require('../db/conn');
-const db_connect = dbo.getDb();
+
 const encryptServ = require('../api/encryptionService');
 //Express middleware to check authentication
 const authenticateUser = async (req, res, next) => {
@@ -28,6 +28,7 @@ const authenticateUser = async (req, res, next) => {
 // Create a user
 router.route('/user/register').post(async function (req, res) {
   try{
+    const db_connect = await dbo.getDb();
     //encrypts password
     console.log('in register');
     let password = await encryptServ.hashPassword(req.body.password);
@@ -55,10 +56,11 @@ router.route('/user/register').post(async function (req, res) {
 // Push recent search to history
 router.route('/user/history').post(authenticateUser, async function (req, res){
   try {
+    const db_connect = await dbo.getDb();
     const searchTerm = req.searchTerm;
     const userCol =db_connect.collection('users');
     const userId = req.user._id
-    const updateRes = await user.collection.updateOne(
+    const updateRes = await userCol.updateOne(
       {_id: userId},
       { $push: {history:searchTerm}}
       );
@@ -74,11 +76,12 @@ router.route('/user/history').post(authenticateUser, async function (req, res){
 // Authenticates User on Login
 router.route('/user/login').post(async function(req,res){
   try{
+    const db_connect = await dbo.getDb();
     const { username, password } = req.body;
     const userCol = db_connect.collection('users');
-    const user = await userCol.findONe({ username });
+    const user = await userCol.findOne({ username });
     if (user && await encryptServ.comparePassword(password, user.password)){
-      req.session.userId = user._id;
+      // res.session.userId = user._id;
       res.status(200).json({message: 'Login Success'});
     }else{
       res.status(401).json({message: 'Invalid Username or Password'});
@@ -87,5 +90,5 @@ router.route('/user/login').post(async function(req,res){
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error'});
   }
-})
+});
 module.exports = router;

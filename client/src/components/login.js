@@ -6,7 +6,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
 
   // Function to handle form submission
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     // In a real-world scenario, you would likely make an API request to validate the credentials
@@ -15,6 +15,24 @@ const Login = () => {
     console.log('Password:', password);
 
     // You can add authentication logic here (e.g., check with a backend server)
+    try{
+      var session;
+      const res = await fetch('http://localhost:8000/api/user/login', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(
+              {username: username,
+              password: password,
+              session}
+          ),
+      });
+  const data = await res.json();
+  console.log('Login Response:' , data);
+  }catch (error){
+    console.error('Login:', error);
+  }
   };
 
   return (

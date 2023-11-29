@@ -17,21 +17,21 @@ const Registration = () => {
     console.log('Password:', password);
 
     try{
-        const res = await fetch('/user/register', {
+        const res = await fetch('http://localhost:8000/api/user/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                username,
-                email,
-                password
-            }),
+            body: JSON.stringify(
+                {username: username,
+                email: email,
+                password: password}
+            ),
         });
     const data = await res.json();
     console.log('Registration Response:' , data);
     }catch (error){
-      console.error('Registration:', error.message);
+      console.error('Registration:', error);
     }
   };
 
