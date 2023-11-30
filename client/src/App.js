@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import LoginForm from './components/login';
 import UserRegistrationForm from './components/registration';
 import Navbar from "./components/navbar";
+import CenteredSearchBar from './components/search';
 import './App.css';
 
 function App() {
@@ -11,7 +12,15 @@ function App() {
     <div>
       <Navbar />
       <Routes>
+        {/*Home Route with centered search */}
+        <Route path='/' element={
+          <div>
+            <CenteredSearchBar />
+          </div>
+        }/>
+        {/*Login Route */}
         <Route path='/login' element={<LoginForm/>}/>
+        {/*registration route*/}
         <Route path='/login/register' element={<UserRegistrationForm/>}/>
       </Routes>
     </div>
