@@ -81,7 +81,7 @@ router.route('/user/login').post(async function(req,res){
     const userCol = db_connect.collection('users');
     const user = await userCol.findOne({ username });
     if (user && await encryptServ.comparePassword(password, user.password)){
-      // res.session.userId = user._id;
+      res.sessioncookie.user = username;
       res.status(200).json({message: 'Login Success'});
     }else{
       res.status(401).json({message: 'Invalid Username or Password'});
@@ -90,5 +90,14 @@ router.route('/user/login').post(async function(req,res){
     console.error(error);
     res.status(500).json({ message: 'Internal Server Error'});
   }
+});
+router.route('/user/logout').post(async function(req, res){
+  req.session.destroy((err) => {
+    if(err){
+      console.log(err);
+    } else{
+      res.redirect('/user/login');
+    }
+  })
 });
 module.exports = router;
