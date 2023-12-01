@@ -4,7 +4,9 @@ const { movieQuery } = require('../api/tmdb');
 
 router.get('/movies', async (req, res) => {
   try {
-    const query = req.query;
+    // console.log(req);
+    const query = await req.query.query;
+    // console.log(query)
     const result = await movieQuery(query);
     res.status(200).json(result);
   } catch (error) {

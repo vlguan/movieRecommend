@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-
+import SearchResults from './pages';
 const CenteredSearchBar = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
 
   const handleSearchChange = event => {
     setSearchTerm(event.target.value);
@@ -10,15 +11,15 @@ const CenteredSearchBar = () => {
     if (event.key === 'Enter') {
       console.log('Search term:', searchTerm);
       try{
-        const res = await fetch('http://localhost:8000/api/movies', {
+        const res = await fetch(`http://localhost:8000/api/movies?query=${searchTerm}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-          query: JSON.stringify(searchTerm),
         });
         const data = await res.json();
-        console.log(data);
+        console.log(data.results);
+        setSearchResults(data.results);
       }catch (error){
         console.error('Search Bar:', error);
       }
@@ -40,6 +41,7 @@ const CenteredSearchBar = () => {
           margin: '10px',
         }}
       />
+      {searchResults && <SearchResults results={searchResults} />}
     </div>
   );
 };
