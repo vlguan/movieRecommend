@@ -5,6 +5,7 @@ import LoginForm from './components/login';
 import UserRegistrationForm from './components/registration';
 import Navbar from "./components/navbar";
 import CenteredSearchBar from './components/search';
+import SearchResultsPage from './components/pages';
 import './App.css';
 
 function App() {
@@ -18,6 +19,8 @@ function App() {
             <CenteredSearchBar />
           </div>
         }/>
+        {/*SearchResult Route */}
+        <Route path="/search-results" element={<SearchResultsPage/>}/>
         {/*Login Route */}
         <Route path='/login' element={<LoginForm/>}/>
         {/*registration route*/}
