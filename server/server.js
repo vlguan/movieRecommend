@@ -18,8 +18,11 @@ store.on('error', function(error){
 const cors = require("cors");
 
 const port = process.env.PORT || 8000;
-
-app.use(cors());
+let corsOptions = {
+  origin:'http://localhost:3000',
+  credentials:true
+}
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(express.json());
 
@@ -30,6 +33,8 @@ app.use(
     saveUninitialized: false,
     store: store,
     cookie: {
+      httpOnly: true,
+      secure: false,
       maxAge: 1000*60*60*24 // equals 1 day
     }
   })
