@@ -24,5 +24,27 @@ async function movieQuery(query) {
     throw new Error( `${error.message}`);
   }
 }
-
-module.exports = { movieQuery };
+async function movieDetail(query){
+  try{
+    const url = `${BASEURL}movie/${query}`;
+    const headers = {
+      accept: 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    }
+    const response = await fetch(url, { options: 'GET', headers });
+    const data = await response.json()
+    let myobj = {
+      movie_id: query,
+      title: data.original_title,
+      genres: data.genres,
+      homepage: data.homepage,
+      releaseDate: data.release_date,
+      summary: data.overview,
+    };
+    return myobj;
+  }catch(error){
+    console.log('error', error);
+    throw new Error(`${error.message}`);
+  }
+}
+module.exports = { movieQuery, movieDetail };

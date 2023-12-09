@@ -1,7 +1,8 @@
 // src/routes/userRoutes.js
-// This file are
+// This file is too route user experience 
 const express = require('express');
 const router = express.Router();
+const memoryCache = require('memory-cache');
 // This will help us connect to the database
 const dbo = require('../db/conn');
 
@@ -81,7 +82,10 @@ router.route('/user/login').post(async function(req,res){
     const userCol = db_connect.collection('users');
     const user = await userCol.findOne({ username });
     if (user && await encryptServ.comparePassword(password, user.password)){
-      res.sessioncookie.user = username;
+      // // res.sessioncookie.user = username;
+      var session = req.session;
+      session.userid=user._id;
+      console.log(session);
       res.status(200).json({message: 'Login Success'});
     }else{
       res.status(401).json({message: 'Invalid Username or Password'});

@@ -14,6 +14,7 @@ module.exports = {
       // console.log(await client.connect());
       _db = await client.db("register");
       console.log("Pinged your deployment. You successfully connected to MongoDB!");
+      return _db;
     }catch(e){
       console.log(e);
     }
