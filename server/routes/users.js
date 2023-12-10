@@ -55,14 +55,15 @@ router.route('/user/register').post(async function (req, res) {
     }
 });
 // Push recent search to history
-router.route('/user/history').post(authenticateUser, async function (req, res){
+router.route('/user/history').post(async function (req, res){
   try {
     const db_connect = await dbo.getDb();
-    const searchTerm = req.searchTerm;
-    const userCol =db_connect.collection('users');
-    const userId = req.user._id
+    const searchTerm = req.body.searchTerm;
+    const userCol =db_connect.collection("users");
+    // const userId = req.session.userid;
+    // console.log(await userCol.findOne({_id: userId}));
     const updateRes = await userCol.updateOne(
-      {_id: userId},
+      {username: req.session.username},
       { $push: {history:searchTerm}}
       );
       if (updateRes.modifiedCount === 1) {
@@ -85,6 +86,7 @@ router.route('/user/login').post(async function(req,res){
       // // res.sessioncookie.user = username;
       var session = req.session;
       session.userid=user._id;
+      session.username=user.username;
       console.log(session);
       res.status(200).json({message: 'Login Success'});
     }else{
@@ -95,7 +97,10 @@ router.route('/user/login').post(async function(req,res){
     res.status(500).json({ message: 'Internal Server Error'});
   }
 });
-router.route('/user/logout').post(async function(req, res){
+router.route('/user').get(function(req, res) {
+  res.status(200).json(req.session);
+})
+router.route('/user/logout').post(function(req, res){
   req.session.destroy((err) => {
     if(err){
       console.log(err);
