@@ -64,7 +64,10 @@ router.route('/user/history').post(async function (req, res){
     // console.log(await userCol.findOne({_id: userId}));
     const updateRes = await userCol.updateOne(
       {username: req.session.username},
-      { $push: {history:searchTerm}}
+      { $push: {history:{
+        term: searchTerm,
+        date: new Date()
+      }}}
       );
       if (updateRes.modifiedCount === 1) {
         res.status(200).json({ message: 'Search term added to history successfully' });
