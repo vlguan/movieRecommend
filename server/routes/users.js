@@ -8,34 +8,19 @@ const dbo = require('../db/conn');
 
 const encryptServ = require('../api/encryptionService');
 //Express middleware to check authentication
-const authenticateUser = async (req, res, next) => {
-  const userId =req.session.userId;
-  if(!userId){
-    return res.status(401).json({ message: 'Unauthorized'});
-  }
-  const userCol = db_connect.collection('users');
-  try {
-    const user = await userCol.findOne({ _id: userId });
-    if(!user){
-      return res.status(401).json({ message: 'Unauthorized'});
-    }
-    req.user = user;
-    next();
-  }catch (error){
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
+const db_helper = async function(){
+  const db_connect = await dbo.getDb();
+  return db_connect.collection("user");
 }
 // Create a user
 router.route('/user/register').post(async function (req, res) {
   try{
-    const db_connect = await dbo.getDb();
     //encrypts password
     console.log('in register');
     let password = await encryptServ.hashPassword(req.body.password);
     let myquery = { username: req.body.username };
     // checks if username already exists
-    let result =  await db_connect.collection("users").findOne(myquery);
+    let result =  await db_helper().findOne(myquery);
     console.log(result)
     if (result == null || result == undefined){
       let userObj = {
@@ -43,8 +28,7 @@ router.route('/user/register').post(async function (req, res) {
         password,
         email: req.body.email
       };
-      const myColl = await db_connect.collection("users");
-      const response = await myColl.insertOne(userObj);
+      const response = await db_helper().insertOne(userObj);
       res.status(200).json(response)
     }else{
         throw new Error('Username exists')
@@ -57,12 +41,8 @@ router.route('/user/register').post(async function (req, res) {
 // Push recent search to history
 router.route('/user/history').post(async function (req, res){
   try {
-    const db_connect = await dbo.getDb();
     const searchTerm = req.body.searchTerm;
-    const userCol =db_connect.collection("users");
-    // const userId = req.session.userid;
-    // console.log(await userCol.findOne({_id: userId}));
-    const updateRes = await userCol.updateOne(
+    const updateRes = await db_helper().updateOne(
       {username: req.session.username},
       { $push: {history:{
         term: searchTerm,
@@ -78,13 +58,42 @@ router.route('/user/history').post(async function (req, res){
     res.status(500).json({ error: error.message });
   }
 });
+// Delete User History, all time or from date
+router.route('/user/history').delete(async function(req, res){
+  try{
+    const username = req.session.username;
+    if(req.body.all == true){
+      const result = db_helper().updateOne({username}, {$unset: {history: ''}});
+      if (result.modifiedCount > 0){
+        res.status(200).json({ message: 'History Successfully Cleared'});
+      }else{
+        res.status(500).json({ error: 'Failed to clear history or no history to clear'});
+      }
+    }else{
+      let startDate, endDate = req.body.dates
+      const result = db_helper().updateOne({username}, {$unset:{
+        history:{
+          date: {$gte: startDate, $lte: endDate}}}})
+    }
+  }catch(error){
+    res.status(500).json({error: error.message})
+  }
+})
+// Get User Profile, including history
+router.route('/user').get(async function (req,res){
+  try{
+    const username = req.session.username;
+    const res = await db_helper().findOne({ username })
+    res.status(200).json(res)
+  }catch(error){
+    res.status(500).json({ error: error.message });
+  }
+});
 // Authenticates User on Login
 router.route('/user/login').post(async function(req,res){
   try{
-    const db_connect = await dbo.getDb();
     const { username, password } = req.body;
-    const userCol = db_connect.collection('users');
-    const user = await userCol.findOne({ username });
+    const user = await db_helper().findOne({ username });
     if (user && await encryptServ.comparePassword(password, user.password)){
       // // res.sessioncookie.user = username;
       var session = req.session;
@@ -100,9 +109,6 @@ router.route('/user/login').post(async function(req,res){
     res.status(500).json({ message: 'Internal Server Error'});
   }
 });
-router.route('/user').get(function(req, res) {
-  res.status(200).json(req.session);
-})
 router.route('/user/logout').post(function(req, res){
   req.session.destroy((err) => {
     if(err){
