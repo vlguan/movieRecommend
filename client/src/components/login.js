@@ -19,6 +19,7 @@ const Login = () => {
       var session;
       const res = await fetch('http://localhost:8000/api/user/login', {
           method: 'POST',
+          credentials: 'include',
           headers: {
               'Content-Type': 'application/json',
           },

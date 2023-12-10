@@ -21,7 +21,8 @@
     "memory-cache": "^0.2.0",
     "mongodb": "^6.3.0",
     "mongoose": "^8.0.1",
-    "redis": "^4.6.11"
+    "redis": "^4.6.11",
+    "serpapi": "^2.0.0"
   },
   "devDependencies": {
     "mongodb-memory-server": "^9.1.1",

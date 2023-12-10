@@ -10,8 +10,21 @@ const CenteredSearchBar = () => {
     if (event.key === 'Enter') {
       console.log('Search term:', searchTerm);
       let encode = encodeURIComponent(searchTerm);
-      console.log(encode);
       navigate(`/search-results?query=${encode}`)
+      try{
+        const res = await fetch(`http://localhost:8000/api/user/history`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body:JSON.stringify({searchTerm: searchTerm})
+      });
+        console.log(res);
+      }catch(error){
+        console.error(error);
+      }
+      
     }
   }
   return (

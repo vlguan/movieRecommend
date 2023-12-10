@@ -2,7 +2,6 @@
 // This file is too route user experience 
 const express = require('express');
 const router = express.Router();
-const memoryCache = require('memory-cache');
 // This will help us connect to the database
 const dbo = require('../db/conn');
 
@@ -61,19 +60,20 @@ router.route('/user/history').post(async function (req, res){
 // Delete User History, all time or from date
 router.route('/user/history').delete(async function(req, res){
   try{
+    var result;
     const username = req.session.username;
     if(req.body.all == true){
-      const result = db_helper().updateOne({username}, {$unset: {history: ''}});
-      if (result.modifiedCount > 0){
-        res.status(200).json({ message: 'History Successfully Cleared'});
-      }else{
-        res.status(500).json({ error: 'Failed to clear history or no history to clear'});
-      }
+      result = db_helper().updateOne({username}, {$unset: {history: ''}});
     }else{
-      let startDate, endDate = req.body.dates
-      const result = db_helper().updateOne({username}, {$unset:{
+      var [startDate, endDate] = req.body.dates;
+      result = db_helper().updateOne({username}, {$unset:{
         history:{
           date: {$gte: startDate, $lte: endDate}}}})
+    }
+    if (result.modifiedCount > 0){
+      res.status(200).json({ message: 'History Successfully Cleared'});
+    }else{
+      res.status(500).json({ error: 'Failed to clear history or no history to clear'});
     }
   }catch(error){
     res.status(500).json({error: error.message})
